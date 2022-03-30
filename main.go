@@ -46,11 +46,8 @@ func CasbinRBACAuthorizer(e *casbin.Enforcer) RBACAuthorizeFunc {
 		if user == nil {
 			return false, errors.New("missing user in request context")
 		}
-		// e.GetRoleManager().(*defaultrolemanager.RoleManager).AddMatchingFunc("key_match", util.KeyMatch2)
-		// e.GetRoleManager().
 		for _, role := range user.GetGroups() {
 			res, err := e.Enforce(role, c.Request.URL.Path, c.Request.Method)
-			// res, ex, err := e.EnforceExWithMatcher("g(r.sub, p.sub) && keyMatch(g2(r.obj, p.obj)) && r.act == p.act")
 
 			if err != nil {
 				fmt.Println(err)
