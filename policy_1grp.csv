@@ -1,0 +1,11 @@
+p, exports, /v1/exports/download/:namespace/:project, GET
+p, exports, /v1/exports/meta/*, GET
+
+g, free, exports
+g, free_to_paid, exports
+g, unlimited, exports
+
+
+p, open, /v1/docs, GET
+p, open, /v1/status, GET
+g, *, open
