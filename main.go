@@ -65,7 +65,7 @@ func CasbinRBACAuthorizer(e *casbin.Enforcer) RBACAuthorizeFunc {
 
 func createHandler(endpoint string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Printf("Allowed access to %s\n", endpoint)
+		// fmt.Printf("Allowed access to %s\n", endpoint)
 		c.Status(http.StatusOK)
 	}
 }
@@ -78,10 +78,10 @@ func setupCasbinRBACMWUser() gin.HandlerFunc {
 		user.SetGroups([]string{grp})
 
 		c.Set("user", user)
-		fmt.Println("url", c.Request.URL.Path)
-		fmt.Println("method", c.Request.Method)
+		// fmt.Println("url", c.Request.URL.Path)
+		// fmt.Println("method", c.Request.Method)
 
-		fmt.Println("role", user.GetGroups())
+		// fmt.Println("role", user.GetGroups())
 	}
 }
 
@@ -122,6 +122,18 @@ func getRBACRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	return r
 }
 
+func runTest(router *gin.Engine, endpoint string, group string) {
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+	req.Header.Set("group", group)
+
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	fmt.Printf("\nUser of group %s accessing %s \t -> Status: %d\n", group, endpoint, w.Code)
+}
+
 func main() {
 	gin.SetMode(gin.TestMode)
 	// e, err := casbin.NewEnforcer("./model.conf", "./policy.csv")
@@ -136,18 +148,11 @@ func main() {
 	)
 
 	runTest(router, "/v1/exports/download/0/enwiki", "free")
-	runTest(router, "/v1/exports/meta/1", "free")
+	runTest(router, "/v1/exports/meta/1", "unlimited")
+	runTest(router, "/v1/exports/meta/1", "new")
+	runTest(router, "/v1/projects", "free")
+	runTest(router, "/v1/page-delete", "free")
+	runTest(router, "/v1/page-delete", "unlimited")
+	runTest(router, "/v1/exports/unknown", "unlimited")
 	runTest(router, "/v1/docs", "new")
-}
-
-func runTest(router *gin.Engine, endpoint string, group string) {
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-	req.Header.Set("group", group)
-
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
-	fmt.Printf("\nUser of group %s accessing %s \t -> Status: %d\n", group, endpoint, w.Code)
 }
