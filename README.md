@@ -1,7 +1,8 @@
 # Prototype RBAC using resource role
 
 This is a prototype implemenation of RBAC for testing purposes. 
-**RBAC with user roles and resource roles**
+
+## RBAC with user roles and resource roles
 
 Originally, we wanted to use RBAC with user roles and resource roles ([sample model](https://github.com/casbin/casbin/blob/master/examples/rbac_with_resource_roles_model.conf) / [sample policy](https://github.com/casbin/casbin/blob/master/examples/rbac_with_resource_roles_policy.csv) ).
 
@@ -21,7 +22,7 @@ g2, /v1/exports/meta/*, exports
 For example,
 Request: `user1` belonging to group `free` accessing `/v1/exports/download/0/enwiki`.
 
-**RBAC with transitive user roles**
+## RBAC with transitive user roles
 
 Instead, we have implemented RBAC with transitive user roles ([sample policy](https://github.com/casbin/casbin/blob/master/examples/rbac_with_resource_roles_policy.csv)) (since our user do not have wildcards). This worked.
 
