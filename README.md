@@ -1,4 +1,4 @@
-# Prototype RBAC using resource role
+# Prototype RBAC 
 
 This is a prototype implemenation of RBAC for testing purposes. 
 
