@@ -78,10 +78,6 @@ func setupCasbinRBACMWUser() gin.HandlerFunc {
 		user.SetGroups([]string{grp})
 
 		c.Set("user", user)
-		// fmt.Println("url", c.Request.URL.Path)
-		// fmt.Println("method", c.Request.Method)
-
-		// fmt.Println("role", user.GetGroups())
 	}
 }
 
@@ -136,8 +132,7 @@ func runTest(router *gin.Engine, endpoint string, group string) {
 
 func main() {
 	gin.SetMode(gin.TestMode)
-	// e, err := casbin.NewEnforcer("./model.conf", "./policy.csv")
-	e, err := casbin.NewEnforcer("./model_1grp.conf", "./policy_1grp.csv")
+	e, err := casbin.NewEnforcer("./model_transitive_user_roles.conf", "./policy_transitive_user_roles.csv")
 	if err != nil {
 		fmt.Println(err)
 	}
