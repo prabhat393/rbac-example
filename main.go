@@ -73,8 +73,10 @@ func createHandler(endpoint string) gin.HandlerFunc {
 func setupCasbinRBACMWUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		grp := c.Request.Header.Get("group")
+		usr := c.Request.Header.Get("username")
+
 		user := new(httpmw.CognitoUser)
-		user.SetUsername("username")
+		user.SetUsername(usr)
 		user.SetGroups([]string{grp})
 
 		c.Set("user", user)
@@ -118,16 +120,18 @@ func getRBACRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	return r
 }
 
-func runTest(router *gin.Engine, endpoint string, group string) {
+func runTest(router *gin.Engine, endpoint string, username string, group string) {
 	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	req.Header.Set("group", group)
+	req.Header.Set("username", username)
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
-	fmt.Printf("\nUser of group %s accessing %s \t -> Status: %d\n", group, endpoint, w.Code)
+	fmt.Printf("\nUser `%s` of group `%s` accessing %s \t -> Status: %d\n", username, group, endpoint, w.Code)
 }
 
 func main() {
@@ -142,12 +146,15 @@ func main() {
 		RBAC(CasbinRBACAuthorizer(e)),
 	)
 
-	runTest(router, "/v1/exports/download/0/enwiki", "free")
-	runTest(router, "/v1/exports/meta/1", "unlimited")
-	runTest(router, "/v1/exports/meta/1", "new")
-	runTest(router, "/v1/projects", "free")
-	runTest(router, "/v1/page-delete", "free")
-	runTest(router, "/v1/page-delete", "unlimited")
-	runTest(router, "/v1/exports/unknown", "unlimited")
-	runTest(router, "/v1/docs", "new")
+	runTest(router, "/v1/exports/download/0/enwiki", "user1", "free")
+	runTest(router, "/v1/exports/meta/1", "user2", "unlimited")
+	runTest(router, "/v1/exports/meta/1", "user2", "new")
+	runTest(router, "/v1/projects", "user3", "free")
+	runTest(router, "/v1/page-delete", "user4", "free")
+	runTest(router, "/v1/page-delete", "user5", "unlimited")
+	runTest(router, "/v1/page-delete", "user5", "unlimited")
+	runTest(router, "/v1/page-delete", "unlimited", "free")
+	runTest(router, "/v1/page-delete", "real_time", "free")
+	runTest(router, "/v1/exports/unknown", "user5", "unlimited")
+	runTest(router, "/v1/docs", "user5", "new")
 }
